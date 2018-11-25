@@ -80,7 +80,9 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
       (progn
         (shell-command (format "autoflake --remove-all-unused-imports -i %s"
                                (shell-quote-argument (buffer-file-name))))
-        (revert-buffer t t t))
+        (revert-buffer t t t)
+        (if (require 'py-isort nil t)
+            (py-isort-buffer)))
     (user-error "autoflake executable not found")))
 
 ;;;###autoload
