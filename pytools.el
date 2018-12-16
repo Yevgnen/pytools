@@ -113,6 +113,18 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
     (pythonic-activate (format "%s/versions/%s" env-root env))
     (setq mode-name (format "%s[%s]" mode-name env))))
 
+;;;###autoload
+(defun pytools-setup-yapf-git-hook ()
+  (interactive)
+  (when-let ((root (locate-dominating-file default-directory ".git"))
+             (cmd (string-join
+                   `(,(format "cd %s" root)
+                     "curl -o pre-commit.sh https://raw.githubusercontent.com/google/yapf/master/plugins/pre-commit.sh"
+                     "chmod a+x pre-commit.sh"
+                     "mv pre-commit.sh .git/hooks/pre-commit")
+                   ";")))
+    (call-process-shell-command cmd nil "*Shell Command Output*" t)))
+
 (provide 'pytools)
 
 ;;; pytools.el ends here
