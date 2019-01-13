@@ -71,7 +71,7 @@
 
 ;; from https://www.snip2code.com/Snippet/127022/Emacs-auto-remove-unused-import-statemen
 ;;;###autoload
-(defun pytools-remove-unused-imports()
+(defun pytools-remove-unused-imports(&optional isort)
   "Use Autoflake to remove unused function.
 
 Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
@@ -81,7 +81,8 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
         (shell-command (format "autoflake --remove-all-unused-imports -i %s"
                                (shell-quote-argument (buffer-file-name))))
         (revert-buffer t t t)
-        (if (require 'py-isort nil t)
+        (if (and isort
+                 (require 'py-isort nil t))
             (py-isort-buffer)))
     (user-error "autoflake executable not found")))
 
