@@ -27,6 +27,21 @@
 
 ;;; Code:
 
+
+(defcustom pytools-defualt-debugger "ipdb"
+  "Defualt debugger")
+
+;; From: https://github.com/syl20bnr/spacemacs/blob/master/layers/%2Blang/python/funcs.el
+;;;###autoload
+(defun pytools-pyenv-executable-find (command)
+  "Find executable taking pyenv shims into account."
+  (if (executable-find "pyenv")
+      (progn
+        (let ((pyenv-string (shell-command-to-string (concat "pyenv which " command))))
+          (unless (string-match "not found" pyenv-string)
+            pyenv-string)))
+    (executable-find command)))
+
 ;;;###autoload
 (defun pytools-execute-file (arg)
   "Execute a python script in a shell."
@@ -49,13 +64,15 @@
   (highlight-lines-matching-regexp "i?pu?db.set_trace()"))
 
 ;;;###autoload
-(defun pytools-toggle-breakpoint ()
+(defun pytools-toggle-breakpoint (arg)
   "Add a break point, highlight it."
-  (interactive)
+  (interactive "P")
   (previous-line)
-  (let ((trace (cond ((executable-find "ipdb") "import ipdb; ipdb.set_trace()")
-                     ((executable-find "pudb") "import pudb; pudb.set_trace()")
-                     (t "import pdb; pdb.set_trace()")))
+  (let ((trace (cond ((and arg (pytools-pyenv-executable-find "ipdb3")) "import ipdb; ipdb.set_trace()")
+                     ((and arg (pytools-pyenv-executable-find "pudb3")) "import pudb; pudb.set_trace()")
+                     ((and arg (pytools-pyenv-executable-find "ipdb")) "import ipdb; ipdb.set_trace()")
+                     ((and arg (pytools-pyenv-executable-find "pudb")) "import pudb; pudb.set_trace()")
+                     (t (format "import %s; %s.set_trace()" pytools-defualt-debugger pytools-defualt-debugger))))
         (line (thing-at-point 'line)))
     (if (and line (string-match trace line))
         (kill-whole-line)
