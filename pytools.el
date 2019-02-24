@@ -81,7 +81,8 @@
         (back-to-indentation)
         (insert trace)
         (insert "\n")
-        (python-indent-line)))))
+        (python-indent-line)
+        (pytools-annotate-pdb)))))
 
 ;; from https://www.snip2code.com/Snippet/127022/Emacs-auto-remove-unused-import-statemen
 ;;;###autoload
