@@ -4,7 +4,6 @@
 ;;
 ;; Author: Yevgnen Koh <wherejoystarts@gmail.com>
 ;; Version: 1.0.0
-;; Package-Requires: ((pythonic "0.1.1"))
 ;; Keywords: python
 ;;
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,8 +26,6 @@
 ;; See documentation on https://github.com/Yevgnen/pytools.
 
 ;;; Code:
-
-(require 'pythonic)
 
 ;;;###autoload
 (defun pytools-execute-file (arg)
@@ -92,27 +89,6 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
   (interactive)
   (delete-trailing-whitespace)
   (untabify-buffer))
-
-;; Virtual environment support
-(make-local-variable 'python-shell-virtualenv-root)
-
-;;;###autoload
-(defun pytools-pyenv-name (&optional fullname)
-  (if-let* ((env-file (locate-dominating-file default-directory ".python-version"))
-            (env (with-temp-buffer
-                   (insert-file-contents
-                    (expand-file-name ".python-version" env-file))
-                   (car (split-string (buffer-string) nil t)))))
-      (if fullname
-          (format "%s/versions/%s" (getenv "PYENV_ROOT") env)
-        env)))
-
-;;;###autoload
-(defun pytools-pyenv-set-env ()
-  (when-let* ((env (pytools-pyenv-name))
-              (env-root (getenv "PYENV_ROOT")))
-    (pythonic-activate (format "%s/versions/%s" env-root env))
-    (setq mode-name (format "%s[%s]" mode-name env))))
 
 ;;;###autoload
 (defun pytools-setup-yapf-git-hook ()
