@@ -92,13 +92,15 @@
 Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
   (interactive)
   (if (executable-find "autoflake")
-      (progn
-        (shell-command (format "autoflake --remove-all-unused-imports -i %s"
-                               (shell-quote-argument (buffer-file-name))))
-        (revert-buffer t t t)
+      (let ((filenmae (shell-quote-argument (buffer-file-name)))
+            (isort-exe (executable-find "isort")))
+        (if isort-exe
+            (shell-command (format "isort -l 10000 %s" filenmae)))
+        (shell-command (format "autoflake --remove-all-unused-imports -i %s" filenmae))
         (if (and isort
                  (require 'py-isort nil t))
-            (py-isort-buffer)))
+            (py-isort-buffer))
+        (revert-buffer t t t))
     (user-error "autoflake executable not found")))
 
 ;;;###autoload
