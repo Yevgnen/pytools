@@ -68,9 +68,7 @@
   "Add a break point, highlight it."
   (interactive "P")
   (previous-line)
-  (let ((trace (cond ((and arg (pytools-pyenv-executable-find "ipdb3")) "import ipdb; ipdb.set_trace()")
-                     ((and arg (pytools-pyenv-executable-find "pudb3")) "import pudb; pudb.set_trace()")
-                     ((and arg (pytools-pyenv-executable-find "ipdb")) "import ipdb; ipdb.set_trace()")
+  (let ((trace (cond ((and arg (pytools-pyenv-executable-find "ipdb")) "import ipdb; ipdb.set_trace()")
                      ((and arg (pytools-pyenv-executable-find "pudb")) "import pudb; pudb.set_trace()")
                      (t (format "import %s; %s.set_trace()" pytools-defualt-debugger pytools-defualt-debugger))))
         (line (thing-at-point 'line)))
