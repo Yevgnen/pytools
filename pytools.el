@@ -115,6 +115,14 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
     (car (split-string (buffer-string) "\n"))))
 
 ;;;###autoload
+(defun pytools-get-lsp-extra-paths (python)
+  (let* ((site-packages  (pytools-get-site-packages python))
+         (egg-links (directory-files site-packages t "\\.egg-link"))
+         (egg-truenames (mapcar #'pytools-get-egg-link-truename egg-links))
+         (current-directory (expand-file-name (file-name-directory (buffer-file-name)))))
+    (vconcat `[,site-packages] egg-truenames)))
+
+;;;###autoload
 (defun pytools-cleanup-buffer ()
   "Just simply clean up a python buffer."
   (interactive)
