@@ -102,6 +102,19 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
     (user-error "autoflake executable not found")))
 
 ;;;###autoload
+(defun pytools-get-site-packages (python)
+  (string-trim
+   (shell-command-to-string
+    (format "%s -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib())\""
+            python))))
+
+;;;###autoload
+(defun pytools-get-egg-link-truename (egg-link)
+  (with-temp-buffer
+    (insert-file-contents-literally egg-link)
+    (car (split-string (buffer-string) "\n"))))
+
+;;;###autoload
 (defun pytools-cleanup-buffer ()
   "Just simply clean up a python buffer."
   (interactive)
