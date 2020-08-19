@@ -103,10 +103,14 @@ Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
 
 ;;;###autoload
 (defun pytools-get-site-packages (python)
-  (string-trim
-   (shell-command-to-string
-    (format "%s -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib())\""
-            python))))
+  (with-temp-buffer
+    (call-process python
+                  nil
+                  (current-buffer)
+                  nil
+                  "-c"
+                  "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+    (string-trim (buffer-string))))
 
 ;;;###autoload
 (defun pytools-get-egg-link-truename (egg-link)
