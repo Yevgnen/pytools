@@ -89,17 +89,27 @@
 
 Command line: autoflake --remove-all-unused-imports -i unused_imports.py"
   (interactive)
-  (if (executable-find "autoflake")
-      (let ((filenmae (shell-quote-argument (buffer-file-name)))
-            (isort-exe (executable-find "isort")))
-        (if isort-exe
-            (shell-command (format "isort -l 10000 %s" filenmae)))
-        (shell-command (format "autoflake --remove-all-unused-imports -i %s" filenmae))
-        (if (and isort
-                 (require 'py-isort nil t))
-            (py-isort-buffer))
-        (revert-buffer t t t))
-    (user-error "autoflake executable not found")))
+  (let ((filename (shell-quote-argument (buffer-file-name))))
+    (if (executable-find "autoflake")
+        (progn
+          ;; Reduce shell calls.
+          (if (executable-find "isort")
+              (let* ((script
+                      (expand-file-name
+                       "script.sh"
+                       (file-name-directory (locate-library "pytools")))))
+                (unless (file-exists-p script)
+                  (with-temp-buffer
+                    (insert "#! /bin/bash\n\n"
+                            "isort -l 10000 $1\n"
+                            "autoflake --remove-all-unused-imports -i $1\n"
+                            "isort --float-to-top $1\n")
+                    (write-file script)
+                    (executable-make-buffer-file-executable-if-script-p)))
+                (call-process "sh" nil nil nil script filename))
+            (shell-command (format "autoflake --remove-all-unused-imports -i %s" filename)))
+          (revert-buffer t t t))
+      (user-error "autoflake executable not found"))))
 
 ;;;###autoload
 (defun pytools-get-site-packages (python)
